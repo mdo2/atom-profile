@@ -1,0 +1,7 @@
+"*":
+  welcome:
+    showOnStartup: false
+  core: {}
+  editor:
+    invisibles: {}
+  "atom-typescript": {}

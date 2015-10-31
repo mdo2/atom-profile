@@ -1,0 +1,8 @@
+# Ignore all dot files, storage, electron, cache, packages, nohup
+/.*
+!.git*
+storage
+electron
+packages
+nohup.out
+*cache*
