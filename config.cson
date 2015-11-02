@@ -1,0 +1,50 @@
+"*":
+  "exception-reporting":
+    userId: "82cbf86c-6a63-0ce2-7261-af39fff5297a"
+  welcome:
+    showOnStartup: false
+  core:
+    themes: [
+      "atom-light-ui"
+      "monokai"
+    ]
+    ignoredNames: [
+      ".git"
+      ".hg"
+      ".svn"
+      ".DS_Store"
+      "Thumbs.db"
+      "._*"
+      ".codekit-cache"
+      "bower_components"
+      "node_modules"
+      "*.pyc"
+    ]
+    projectHome: "/home/francisco/projects"
+  "one-dark-ui": {}
+  "linter-pep8": {}
+  "linter-less":
+    strictUnits: true
+    ignoreUndefinedVariables: true
+  linter: {}
+  editor:
+    invisibles: {}
+    showIndentGuide: true
+  minimap:
+    plugins:
+      "highlight-selected": true
+      selection: true
+  "git-diff":
+    showIconsInEditorGutter: true
+  "django-templates": {}
+  "highlight-selected":
+    onlyHighlightWholeWords: true
+  "atom-typescript": {}
+  "autoclose-html": {}
+".django.python.source":
+  editor:
+    softWrap: true
+    softWrapAtPreferredLineLength: true
+".angular.html.text":
+  editor:
+    tabLength: 4
