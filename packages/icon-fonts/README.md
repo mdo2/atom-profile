@@ -18,7 +18,7 @@ Converted from the [package](https://github.com/idleberg/Icon-Fonts-Sublime-Text
 
 ### GitHub
 
-1. Change directory to `~/.atom/packages/`
+1. Change directory `cd ~/.atom/packages/`
 2. Clone repository `git clone https://github.com/idleberg/atom-icon-fonts icon-fonts`
 
 ## Usage
@@ -44,7 +44,7 @@ Prefix         | Icon Font | Version | cdnjs | jsDelivr
 `ion`          | [Ionicons](https://github.com/driftyco/ionicons) | 2.0.1 | 🚫 | 🚫
 `line`         | [Elegant Theme Line Icons](http://www.elegantthemes.com/blog/resources/how-to-use-and-embed-an-icon-font-on-your-website) | – | 🚫 | 🚫
 `mfg`          | [MFG Labs Iconset](http://mfglabs.github.io/mfglabs-iconset/) | – | 🚫 | 🚫
-`octicon`      | [GitHub Octicons](https://octicons.github.com/) | 2.4.1 | 🚫 | 🚫
+`octicon`      | [GitHub Octicons](https://octicons.github.com/) | 3.3.0 | 🚫 | 🚫
 `oi`           | [Open Iconic](https://useiconic.com/open/) | 1.1.0 | 🚫 | ✅
 `openwebicons` | [OpenWeb Icons](http://pfefferle.github.io/openwebicons/) | 1.3.2| 🚫 | 🚫
 `pf`           | [PaymentFont](http://paymentfont.io/) | 1.1.2 | ✅ | 🚫
@@ -53,7 +53,7 @@ Prefix         | Icon Font | Version | cdnjs | jsDelivr
 `st`           | [Stack Icons](http://stackicons.com/) | 1.0.0 | 🚫 | 🚫
 `typicon`      | [Typicons](http://typicons.com/) | 2.0.7 | 🚫 | 🚫
 `ui`           | [Semantic UI Icons](http://semantic-ui.com/elements/icon.html) | 2.0.7 | ✅ | ✅
-`zmdi`         | [Material Design Iconic Font](https://github.com/zavoloklom/material-design-iconic-font) | 2.1.2 | ✅ | 🚫
+`zmdi`         | [Material Design Iconic Font](https://github.com/zavoloklom/material-design-iconic-font) | 2.2.0 | ✅ | 🚫
 
 \* Vanilla Glyphicons and Bootstrap Glyphicons use different class-names, the former adding a plural-s to its classes. On completion, a tab-stop is added to support both options. Future versions will deprecate this distinction, since [Bootstrap 4](http://blog.getbootstrap.com/2015/08/19/bootstrap-4-alpha/) is likely to ship without (glyph)icons.
 

@@ -41,10 +41,10 @@
     onlyHighlightWholeWords: true
   "atom-typescript": {}
   "autoclose-html": {}
-".angular.html.text":
-  editor:
-    tabLength: 4
 ".django.python.source":
   editor:
     softWrap: true
     softWrapAtPreferredLineLength: true
+".angular.html.text":
+  editor:
+    tabLength: 4

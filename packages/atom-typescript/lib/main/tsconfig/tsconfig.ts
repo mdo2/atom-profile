@@ -17,6 +17,8 @@ var types = simpleValidator.types;
  */
 interface CompilerOptions {
     allowNonTsExtensions?: boolean;
+    allowUnreachableCode?: boolean;
+    allowUnusedLabels?: boolean;
     charset?: string;
     codepage?: number;
     declaration?: boolean;
@@ -40,7 +42,9 @@ interface CompilerOptions {
     noEmitHelpers?: boolean;
     noEmitOnError?: boolean;
     noErrorTruncation?: boolean;
+    noFallthroughCasesInSwitch?: boolean;
     noImplicitAny?: boolean;                          // Error on inferred `any` type
+    noImplicitReturns?: boolean;
     noLib?: boolean;
     noLibCheck?: boolean;
     noResolve?: boolean;
@@ -61,8 +65,10 @@ interface CompilerOptions {
 }
 
 var compilerOptionsValidation: simpleValidator.ValidationInfo = {
-    allowNonTsExtensions: { type: simpleValidator.types.boolean },
-    charset: { type: simpleValidator.types.string },
+    allowNonTsExtensions: { type: types.boolean },
+    allowUnreachableCode: { type: types.boolean },
+    allowUnusedLabels: { type: types.boolean },
+    charset: { type: types.string },
     codepage: { type: types.number },
     declaration: { type: types.boolean },
     diagnostics: { type: types.boolean },
@@ -85,7 +91,9 @@ var compilerOptionsValidation: simpleValidator.ValidationInfo = {
     noEmitHelpers: { type: types.boolean },
     noEmitOnError: { type: types.boolean },
     noErrorTruncation: { type: types.boolean },
+    noFallthroughCasesInSwitch: { type: types.boolean },
     noImplicitAny: { type: types.boolean },
+    noImplicitReturns: { type: types.boolean },
     noLib: { type: types.boolean },
     noLibCheck: { type: types.boolean },
     noResolve: { type: types.boolean },
@@ -129,6 +137,7 @@ interface TypeScriptProjectRawSpecification {
     buildOnSave?: boolean;
     externalTranspiler?: string | { name: string; options?: any };
     scripts?: { postbuild?: string };
+    atom?: { rewriteTsconfig?: boolean };
 }
 
 /**
@@ -146,6 +155,7 @@ export interface TypeScriptProjectSpecification {
     package?: UsefulFromPackageJson;
     externalTranspiler?: string | { name: string; options?: any };
     scripts: { postbuild?: string };
+    atom: { rewriteTsconfig: boolean };
 }
 
 ///////// FOR USE WITH THE API /////////////
@@ -337,7 +347,8 @@ export function getDefaultInMemoryProject(srcFile: string): TypeScriptProjectFil
         formatCodeOptions: formatting.defaultFormatCodeOptions(),
         compileOnSave: true,
         buildOnSave: false,
-        scripts: {}
+        scripts: {},
+        atom: { rewriteTsconfig: true },
     };
 
     return {
@@ -385,10 +396,17 @@ export function getProjectSync(pathOrSrcFile: string): TypeScriptProjectFileDeta
             new Error(errors.GET_PROJECT_JSON_PARSE_FAILED), { projectFilePath: fsu.consistentPath(projectFile), error: ex.message });
     }
 
+    /** Setup defaults for atom key */
+    if (!projectSpec.atom) {
+        projectSpec.atom = {
+            rewriteTsconfig: true,
+        }
+    }
+
     if (projectSpec.filesGlob) { // for filesGlob we keep the files in sync
         var prettyJSONProjectSpec = prettyJSON(projectSpec, detectIndent(projectFileTextContent).indent);
 
-        if (prettyJSONProjectSpec !== projectFileTextContent) {
+        if (prettyJSONProjectSpec !== projectFileTextContent && projectSpec.atom.rewriteTsconfig) {
             fs.writeFileSync(projectFile, prettyJSONProjectSpec);
         }
     }
@@ -421,7 +439,8 @@ export function getProjectSync(pathOrSrcFile: string): TypeScriptProjectFileDeta
         typings: [],
         externalTranspiler: projectSpec.externalTranspiler == undefined ? undefined : projectSpec.externalTranspiler,
         scripts: projectSpec.scripts || {},
-        buildOnSave: !!projectSpec.buildOnSave
+        buildOnSave: !!projectSpec.buildOnSave,
+        atom: { rewriteTsconfig: true }
     };
 
     // Validate the raw compiler options before converting them to TS compiler options
@@ -512,32 +531,36 @@ function increaseProjectForReferenceAndImports(files: string[]): string[] {
             var preProcessedFileInfo = ts.preProcessFile(content, true),
                 dir = path.dirname(file);
 
+            let extensions = ['.ts', '.d.ts', '.tsx'];
+            function getIfExists(filePathNoExt: string) {
+                for (let ext of extensions) {
+                    if (fs.existsSync(filePathNoExt + ext)) {
+                        return filePathNoExt + ext;
+                    }
+                }
+            }
+
             referenced.push(
                 preProcessedFileInfo.referencedFiles.map(fileReference => {
                     // We assume reference paths are always relative
                     var file = path.resolve(dir, fsu.consistentPath(fileReference.fileName));
-                    // Try all three, by itself, .ts, .d.ts
+                    // Try by itself then with extensions
                     if (fs.existsSync(file)) {
                         return file;
                     }
-                    if (fs.existsSync(file + '.ts')) {
-                        return file + '.ts';
-                    }
-                    if (fs.existsSync(file + '.d.ts')) {
-                        return file + '.d.ts';
-                    }
-                    return null;
+                    return getIfExists(file);
                 }).filter(file=> !!file)
                     .concat(
                     preProcessedFileInfo.importedFiles
                         .filter((fileReference) => pathIsRelative(fileReference.fileName))
                         .map(fileReference => {
-                            var file = path.resolve(dir, fileReference.fileName + '.ts');
-                            if (!fs.existsSync(file)) {
-                                file = path.resolve(dir, fileReference.fileName + '.d.ts');
+                            let fileNoExt = path.resolve(dir, fileReference.fileName);
+                            let file = getIfExists(fileNoExt);
+                            if (!file) {
+                                file = getIfExists(`${file}/index`);
                             }
                             return file;
-                        })
+                        }).filter(file=> !!file)
                     )
             );
         });
