@@ -1,3 +1,4 @@
+"use strict";
 var mkdirp = require('mkdirp');
 var path = require('path');
 var fs = require('fs');
@@ -78,6 +79,18 @@ function getRawOutput(proj, filePath) {
     return output;
 }
 exports.getRawOutput = getRawOutput;
+function getRawOutputPostExternal(proj, filePath) {
+    var output1 = getRawOutput(proj, filePath);
+    var sourceFile = proj.languageService.getSourceFile(filePath);
+    var sourceMapContents = {};
+    return runExternalTranspiler(filePath, sourceFile.text, output1.outputFiles[0], proj, sourceMapContents).then(function () {
+        return {
+            outputFiles: output1.outputFiles,
+            emitSkipped: false
+        };
+    });
+}
+exports.getRawOutputPostExternal = getRawOutputPostExternal;
 function getBabelInstance(projectDirectory) {
     return new Promise(function (resolve) {
         if (!babels[projectDirectory]) {
@@ -161,7 +174,10 @@ function runExternalTranspiler(sourceFileName, sourceFileText, outputFile, proje
                 if (!settings.compilerOptions.removeComments) {
                     babelOptions.comments = true;
                 }
+                var directory = process.cwd();
+                process.chdir(project.projectFile.projectFileDirectory);
                 var babelResult = babel.transform(outputFile.text, babelOptions);
+                process.chdir(directory);
                 outputFile.text = babelResult.code;
                 if (babelResult.map && settings.compilerOptions.sourceMap) {
                     var additionalEmit = {
